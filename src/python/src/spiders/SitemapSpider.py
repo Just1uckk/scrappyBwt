@@ -1,21 +1,22 @@
-import logging
-
 import scrapy
 from scrapy import Selector
 from scrapy.core.downloader.handlers.http11 import TunnelError
-from scrapy.exceptions import CloseSpider
-from scrapy.spiders import SitemapSpider, Rule
-from scrapy.linkextractors import LinkExtractor
 
 from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
-from rmq.spiders import TaskBaseSpider, HttpbinSpider
+from rmq.spiders import HttpbinSpider
 from rmq.utils import get_import_full_name
 from rmq.utils.decorators import rmq_callback, rmq_errback
 
 
 class MetaUrlItem(RMQItem):
     url = scrapy.Field()
+
+
+def decode_util(response):
+    decoded_body = Selector(text=response.body.decode('utf-8'))
+    return decoded_body
+
 
 class SitemapspiderSpider(HttpbinSpider):
     name = "SitemapSpider"
@@ -27,21 +28,17 @@ class SitemapspiderSpider(HttpbinSpider):
         self.result_queue_name = f"{self.name}_result_queue"
 
     def start_requests(self):
-        yield scrapy.Request("https://www.bbb.org/sitemap-business-profiles-index.xml", callback=self.parse_sitemap, dont_filter=True)
-
-    def decode_util(self, response):
-        decoded_body = Selector(text=response.body.decode('utf-8'))
-        return decoded_body
+        yield scrapy.Request("https://www.bbb.org/sitemap-business-profiles-index.xml", callback=self.parse_sitemap)
 
     def parse_sitemap(self, response):
-        selector = self.decode_util(response)
+        selector = decode_util(response)
         urls = selector.xpath('//loc/text()').extract()
         for loc in urls:
-            yield scrapy.Request(loc, callback=self.parse_page)
+            yield scrapy.Request(loc, callback=self.parse)
 
     @rmq_callback
-    def parse_page(self, response):
-        selector = self.decode_util(response)
+    def parse(self, response):
+        selector = decode_util(response)
         urls = selector.xpath('//loc/text()').extract()
         for loc in urls:
             self.logger.critical(loc)
@@ -54,4 +51,3 @@ class SitemapspiderSpider(HttpbinSpider):
             yield failure.request.copy()
         else:
             self.logger.warning(f"IN ERRBACK: {repr(failure)}")
-
