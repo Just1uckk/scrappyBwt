@@ -11,7 +11,7 @@ from rmq.pipelines import ItemProducerPipeline
 from rmq.spiders import TaskToSingleResultSpider
 from rmq.utils import get_import_full_name
 from rmq.utils.decorators import rmq_callback, rmq_errback
-from utils import GeneratorUniqueId, ParseAddress
+from utils import GeneratorUniqueId, ParseAddress, ParsePhoneNumber, ParseWorkHours, ParseCustomerReviews
 
 
 class MetaInfoItem(RMQItem):
@@ -19,6 +19,14 @@ class MetaInfoItem(RMQItem):
     business_name = scrapy.Field()
     business_address = scrapy.Field()
     business_category = scrapy.Field()
+    business_web_url = scrapy.Field()
+    business_img_url = scrapy.Field()
+    business_phone = scrapy.Field()
+    business_fax = scrapy.Field()
+    business_hours = scrapy.Field()
+    business_stars = scrapy.Field()
+    business_customer_reviews = scrapy.Field()
+    business_bbb_rating = scrapy.Field()
     business_detailed_url = scrapy.Field()
 
 # class AdressField:
@@ -45,19 +53,44 @@ class InfospiderSpider(TaskToSingleResultSpider):
         business_name = response.css('span.bds-h2::text').get()
         business_category = response.xpath('//h1[@class="stack"]/following-sibling::div[1]/text()').get()
         business_address = ParseAddress().parse_address(response.css('address p.bds-body::text').getall())
-        print(MetaInfoItem({
-            'business_id': business_id,
-            'business_name': business_name,
-            'business_address': business_address,
-            'business_detailed_url': business_detailed_url,
-            'business_category': business_category
-        }))
+        business_web_url = response.xpath('//a[@class="dtm-url"]/@href').extract_first()
+        business_img_url = response.css('div.dtm-logo img::attr(src)').extract_first()
+        business_phone = ParsePhoneNumber().clean_phone_number(response.xpath('//a[@class="dtm-phone"]/text()').get())
+        business_fax = None # Question to Igor
+        business_hours = ParseWorkHours().parse_work_hours(response)
+        business_stars = response.css('div.dtm-stars + *::text').get()
+        business_customer_reviews = ParseCustomerReviews().parse_customer_reviews(response)
+        business_bbb_rating = response.css('span.dtm-rating span span::text').get()
+
+        # print(MetaInfoItem({
+        #     'business_id': business_id,
+        #     'business_name': business_name,
+        #     'business_address': business_address,
+        #     'business_detailed_url': business_detailed_url,
+        #     'business_web_url': business_web_url,
+        #     'business_img_url': business_img_url,
+        #     'business_phone': business_phone,
+        #     'business_fax': business_fax,
+        #     'business_hours': business_hours,
+        #     'business_stars': business_stars,
+        #     'business_customer_reviews': business_customer_reviews,
+        #     'business_bbb_rating': business_bbb_rating,
+        # }))
+        print(response.url)
         yield MetaInfoItem({
             'business_id': business_id,
             'business_name': business_name,
+            'business_category': business_category,
             'business_address': business_address,
             'business_detailed_url': business_detailed_url,
-            'business_category': business_category
+            'business_web_url': business_web_url,
+            'business_img_url': business_img_url,
+            'business_phone': business_phone,
+            'business_fax': business_fax,
+            'business_hours': business_hours,
+            'business_stars': business_stars,
+            'business_customer_reviews': business_customer_reviews,
+            'business_bbb_rating': business_bbb_rating,
         })
 
     @rmq_errback

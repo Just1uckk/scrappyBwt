@@ -1,12 +1,20 @@
 from geopy import Nominatim
+from geopy.exc import GeocoderUnavailable
 
 
 def get_country(city):
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    location = geolocator.geocode(city)
-    if location:
-        return location.address.split(",")[-1].strip()
-    else:
+    try:
+        geolocator = Nominatim(user_agent="geoapiExercises")
+        location = geolocator.geocode(city)
+        if location:
+            return location.address.split(",")[-1].strip()
+        else:
+            return None
+    except GeocoderUnavailable as e:
+        print("GEOPY. Geocoding service is unavailable:", e)
+        return None
+    except Exception as e:
+        print("GEOPY. An error occurred:", e)
         return None
 
 
@@ -24,7 +32,8 @@ class ParseAddress:
                 street = revert_address_arr[3]
             return {
                 "full_address": ', '.join(refactor_address),
-                "country": get_country(city),
+                # "country": get_country(city),
+                "country": "Canada",
                 "region": region,
                 "city": city,
                 "street": street,
