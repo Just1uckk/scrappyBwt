@@ -62,3 +62,5 @@ coverage.xml
 .python-version
 
 docker/.docker_env
+sitemap_parse.json
+sit_info.csv
