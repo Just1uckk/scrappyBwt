@@ -2,16 +2,15 @@ import json
 
 import scrapy
 
-from utils import ParseWorkHours, ParseCustomerReviews
+from utils import ParseWorkHours, ParseCustomerReviews, ParseManagement, ParseSocialMedia
 
 
 class TestspiderSpider(scrapy.Spider):
     name = "TestSpider"
     allowed_domains = ["bbb.org"]
-    start_urls = ["https://www.bbb.org/us/ca/san-jose/profile/new-car-dealers/capitol-toyotascion-1216-198833"]
+    start_urls = ["https://www.bbb.org/us/ca/sausalito/profile/food-manufacturer/california-caviar-company-1116-316068/details"]
 
     def parse(self, response):
-        # business_stars = response.css('div.dtm-stars + *::text').get()
-        business_bbb_rating = response.css('span.dtm-rating span span::text').getall()
-        print(business_bbb_rating)
+        business_social_media = ParseSocialMedia().parse_social_media(response)
+        print(business_social_media)
         pass
