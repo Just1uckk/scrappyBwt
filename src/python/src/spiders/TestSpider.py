@@ -2,7 +2,7 @@ import json
 
 import scrapy
 
-from utils import ParseWorkHours, ParseCustomerReviews, ParseManagement, ParseSocialMedia
+from utils import ParseWorkHours, ParseCustomerReviews, ParseManagement, ParseSocialMedia, ParseID
 
 
 class TestspiderSpider(scrapy.Spider):
@@ -11,6 +11,5 @@ class TestspiderSpider(scrapy.Spider):
     start_urls = ["https://www.bbb.org/us/ca/sausalito/profile/food-manufacturer/california-caviar-company-1116-316068/details"]
 
     def parse(self, response):
-        business_social_media = ParseSocialMedia().parse_social_media(response)
-        print(business_social_media)
+        business_social_media = ParseID().parse_id(response.url)
         pass

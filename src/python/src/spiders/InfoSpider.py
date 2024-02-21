@@ -10,7 +10,7 @@ from rmq.spiders import TaskToSingleResultSpider, TaskToMultipleResultsSpider
 from rmq.utils import get_import_full_name
 from rmq.utils.decorators import rmq_callback, rmq_errback
 from utils import GeneratorUniqueId, ParseAddress, ParsePhoneNumber, ParseWorkHours, ParseCustomerReviews, \
-    ParseManagement, ParseContactInformation, ParseSocialMedia
+    ParseManagement, ParseContactInformation, ParseSocialMedia, ParseID
 
 
 class MetaInfoItem(RMQItem):
@@ -20,13 +20,13 @@ class MetaInfoItem(RMQItem):
     business_category = scrapy.Field()
     business_web_url = scrapy.Field()
     business_img_url = scrapy.Field()
+    business_detailed_url = scrapy.Field()
     business_phone = scrapy.Field()
     business_fax = scrapy.Field()
     business_hours = scrapy.Field()
     business_stars = scrapy.Field()
     business_customer_reviews = scrapy.Field()
     business_bbb_rating = scrapy.Field()
-    business_detailed_url = scrapy.Field()
     business_accredited_date = scrapy.Field()
     business_social_media = scrapy.Field()
     business_years = scrapy.Field()
@@ -52,7 +52,7 @@ class InfospiderSpider(TaskToMultipleResultsSpider):
 
     @rmq_callback
     def parse(self, response):
-        business_id = GeneratorUniqueId().string_to_unique_id(response.url)
+        business_id = ParseID().parse_id(response.url)
         business_detailed_url = response.xpath("//a[@class='dtm-read-more']/@href").extract_first()
         business_name = response.css('span.bds-h2::text').get()
         business_category = response.xpath('//h1[@class="stack"]/following-sibling::div[1]/text()').get()
@@ -91,8 +91,8 @@ class InfospiderSpider(TaskToMultipleResultsSpider):
         business_years = response.xpath(
             '//dt[contains(text(),"Years in Business")]/following-sibling::dd[1]/text()').get()
         business_social_media = ParseSocialMedia().parse_social_media(response)
-        business_fax = response.xpath(
-            '//div[contains(text(),"Primary Fax")]/preceding-sibling::span[1]/text()').get()
+        business_fax = ParsePhoneNumber().clean_phone_number(response.xpath(
+            '//div[contains(text(),"Primary Fax")]/preceding-sibling::span[1]/text()').get())
         business_management = ParseManagement().parse_management(response)
         business_contact_information = ParseContactInformation().parse_contact_information(response)
         parse_date = datetime.strftime(datetime.now(), '%d/%m/%Y')

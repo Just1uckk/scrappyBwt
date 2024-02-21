@@ -10,3 +10,4 @@ from .parse_customer_reviews import ParseCustomerReviews
 from .parse_management import ParseManagement
 from .parse_contact_information import ParseContactInformation
 from .parse_social_media import ParseSocialMedia
+from .parse_id import ParseID

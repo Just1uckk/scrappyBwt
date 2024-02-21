@@ -1,3 +1,6 @@
+import json
+
+
 class ParseSocialMedia:
 
     @staticmethod
@@ -15,4 +18,4 @@ class ParseSocialMedia:
                     data["facebook"] = media
                 if "twitter" in media:
                     data["twitter"] = media
-            return data
+            return json.dumps(data)
