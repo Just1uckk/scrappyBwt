@@ -2,7 +2,6 @@ from sqlalchemy.dialects.mysql import insert
 
 from database.models.info_page import InfoPage
 from rmq.commands import Consumer
-from rmq.utils import TaskStatusCodes
 
 
 class InfoPagesResultConsumer(Consumer):
@@ -11,11 +10,12 @@ class InfoPagesResultConsumer(Consumer):
         return queue_name
 
     def build_message_store_stmt(self, message_body):
-        message_body['status'] = TaskStatusCodes.SUCCESS.value
         stmt = insert(InfoPage)
         stmt = stmt.on_duplicate_key_update({
             'status': stmt.inserted.status
         }).values({
+            "status": message_body['status'],
+            "exception": message_body['exception'],
             "business_id": message_body['business_id'],
             "business_name": message_body['business_name'],
             "business_address": message_body['business_address'],

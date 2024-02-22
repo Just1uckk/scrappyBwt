@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update, text
 
 from database.models.sitemap_pages import SitemapPages
 from rmq.commands import Producer
@@ -15,3 +15,11 @@ class InfoPagesTasksProducer(Producer):
             SitemapPages.status == TaskStatusCodes.NOT_PROCESSED.value,
         ).order_by(SitemapPages.id.asc()).limit(chunk_size)
         return stmt
+
+    def build_task_update_stmt(self, db_task, status):
+        return update(SitemapPages).where(
+            SitemapPages.id == db_task["id"]
+        ).values({
+            "status": TaskStatusCodes.IN_QUEUE.value,
+            "attempt": text("attempt + 1")
+        })

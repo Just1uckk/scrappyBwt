@@ -7,4 +7,7 @@ class ParseID:
         pattern = r'\d+'
         id_pattern_result = re.findall(pattern, url)
         business_id = ''.join(id_pattern_result)
-        return int(business_id)
+        if business_id != '':
+            return int(business_id)
+        else:
+            return None
