@@ -20,7 +20,7 @@ def decode_util(response):
 
 
 class SitemapSpider(HttpbinSpider):
-    name = "SitemapSpider"
+    name = "sitemap_spider"
 
     custom_settings = {"ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, }}
 

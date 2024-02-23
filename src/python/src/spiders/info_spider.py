@@ -36,7 +36,7 @@ class MetaInfoItem(RMQItem):
     business_management = scrapy.Field()
 
 class InfoSpider(TaskToMultipleResultsSpider):
-    name = "InfoSpider"
+    name = "info_spider"
 
     custom_settings = {"ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, }}
 

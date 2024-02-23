@@ -15,10 +15,11 @@ from twisted.enterprise.adbapi import Transaction
 from twisted.internet import reactor, defer
 
 from commands.base import BaseCommand
+from database.models.info_page import InfoPage
 
 
 class BaseCSVExporter(BaseCommand):
-    table: Table
+    table: Table(InfoPage, InfoPage.__name__, InfoPage.metadata)
     file_timestamp_format: str = '%Y%b%d%H%M%S'
     export_date_column: str = 'sent_to_customer'
     file_extension: str = 'csv'
