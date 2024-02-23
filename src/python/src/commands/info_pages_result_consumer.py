@@ -1,4 +1,5 @@
 from sqlalchemy.dialects.mysql import insert
+from scrapy.utils.project import get_project_settings
 
 from database.models.info_page import InfoPage
 from rmq.commands import Consumer
@@ -6,16 +7,13 @@ from rmq.commands import Consumer
 
 class InfoPagesResultConsumer(Consumer):
     def init_queue_name(self, opts):
-        self.queue_name = queue_name = 'info_spider_result_queue'
+        self.project_settings = get_project_settings()
+        self.queue_name = queue_name = self.project_settings.get("RABBITMQ_INFO_RESULTS")
         return queue_name
 
     def build_message_store_stmt(self, message_body):
         stmt = insert(InfoPage)
-        stmt = stmt.on_duplicate_key_update({
-            'status': stmt.inserted.status
-        }).values({
-            "status": message_body['status'],
-            "exception": message_body['exception'],
+        stmt = stmt.values({
             "business_id": message_body['business_id'],
             "business_name": message_body['business_name'],
             "business_address": message_body['business_address'],

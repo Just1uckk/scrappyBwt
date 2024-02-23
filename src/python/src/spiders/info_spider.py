@@ -1,11 +1,8 @@
 import json
 
 import scrapy
-from scrapy.core.downloader.handlers.http11 import TunnelError
-
+from scrapy.utils.project import get_project_settings
 from datetime import datetime
-
-from scrapy.spidermiddlewares.httperror import HttpError
 
 from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
@@ -17,8 +14,6 @@ from utils import GeneratorUniqueId, ParseAddress, ParsePhoneNumber, ParseWorkHo
 
 
 class MetaInfoItem(RMQItem):
-    status = scrapy.Field()
-    exception = scrapy.Field()
     business_id = scrapy.Field()
     business_name = scrapy.Field()
     business_address = scrapy.Field()
@@ -40,46 +35,19 @@ class MetaInfoItem(RMQItem):
     business_contact_information = scrapy.Field()
     business_management = scrapy.Field()
 
-
-def empty_metadata_info(status, error_id, description, url):
-    item = MetaInfoItem()
-    item['status'] = status
-    item['exception'] = f"Error code: {error_id}. Description: {description}."
-    item['business_id'] = ParseID().parse_id(url)
-    item['business_name'] = None
-    item['business_address'] = None
-    item['business_category'] = None
-    item['business_web_url'] = None
-    item['business_img_url'] = None
-    item['business_detailed_url'] = url
-    item['business_phone'] = None
-    item['business_fax'] = None
-    item['business_hours'] = None
-    item['business_stars'] = None
-    item['business_customer_reviews'] = None
-    item['business_bbb_rating'] = None
-    item['business_accredited_date'] = None
-    item['business_social_media'] = None
-    item['business_years'] = None
-    item['business_started_date'] = None
-    item['parse_date'] = None
-    item['business_contact_information'] = None
-    item['business_management'] = None
-    return item
-
-
-class InfospiderSpider(TaskToMultipleResultsSpider):
+class InfoSpider(TaskToMultipleResultsSpider):
     name = "InfoSpider"
 
     custom_settings = {"ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, }}
 
     def __init__(self, *args, **kwargs):
-        super(InfospiderSpider, self).__init__(*args, **kwargs)
-        self.task_queue_name = "info_spider_tasks_queue"
-        self.result_queue_name = "info_spider_result_queue"
+        super(InfoSpider, self).__init__(*args, **kwargs)
+        self.project_settings = get_project_settings()
+        self.task_queue_name = self.project_settings.get("RABBITMQ_INFO_TASKS")
+        self.result_queue_name = self.project_settings.get("RABBITMQ_INFO_RESULTS")
         # Пример как подключится к таске
-        first_task = self.processing_tasks.get_task(delivery_tag=1)
-        first_task.exception = 'Something'
+        # first_task = self.processing_tasks.get_task(delivery_tag=1)
+        # first_task.exception = 'Something'
 
     def next_request(self, _delivery_tag, msg_body):
         data = json.loads(msg_body)
@@ -136,8 +104,6 @@ class InfospiderSpider(TaskToMultipleResultsSpider):
         business_contact_information = ParseContactInformation().parse_contact_information(response)
         parse_date = datetime.strftime(datetime.now(), '%d/%m/%Y')
         yield MetaInfoItem({
-            'status': TaskStatusCodes.SUCCESS.value,
-            'exception': None,
             'business_id': response.meta['business_id'],
             'business_name': response.meta['business_name'],
             'business_category': response.meta['business_category'],
@@ -162,26 +128,20 @@ class InfospiderSpider(TaskToMultipleResultsSpider):
 
     @rmq_errback
     def _errback(self, failure):
-        if failure.check(HttpError):
-            status_code = failure.value.response.status
-            description = str(failure.value)
-            url = failure.value.response.url
-            yield empty_metadata_info(TaskStatusCodes.ERROR.value, status_code, description, url)
-        elif failure.check(TunnelError):
-            self.logger.info("TunnelError. Copy request")
-            yield failure.request.copy()
-        else:
-            self.logger.warning(f"IN ERRBACK: {repr(failure)}")
+        delivery_tag = failure.request.meta["delivery_tag"]
+        status_code = failure.value.response.status
+        description = str(failure.value)
+        self.logger.error(f'Code: {status_code}. Description: {description}')
+        self.processing_tasks.set_status(delivery_tag, TaskStatusCodes.ERROR.value)
+        self.processing_tasks.set_exception(delivery_tag, f'Code: {status_code}. Description: {description}')
+
 
     @rmq_errback
     def _errback_second(self, failure):
-        if failure.check(HttpError):
-            status_code = failure.value.response.status
-            description = str(failure.value)
-            url = failure.value.response.url.replace("/details", "")
-            yield empty_metadata_info(TaskStatusCodes.ERROR.value, status_code, description, url)
-        elif failure.check(TunnelError):
-            self.logger.info("TunnelError. Copy request")
-            yield failure.request.copy()
-        else:
-            self.logger.warning(f"IN ERRBACK: {repr(failure)}")
+        delivery_tag = failure.request.meta["delivery_tag"]
+        status_code = failure.value.response.status
+        description = str(failure.value)
+        self.logger.error(f'Code: {status_code}. Description: {description}')
+        self.processing_tasks.set_status(delivery_tag, TaskStatusCodes.ERROR.value)
+        self.processing_tasks.set_exception(delivery_tag, f'Code: {status_code}. Description: {description}')
+

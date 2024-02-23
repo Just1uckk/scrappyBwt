@@ -16,10 +16,10 @@ from sqlalchemy.dialects.mysql import TEXT, INTEGER, BIGINT, MEDIUMINT
 class InfoPage(
     Base,
     MysqlPrimaryKeyMixin,
-    MysqlStatusMixin,
+    # MysqlStatusMixin,
     MysqlTimestampsMixin,
-    MysqlPriorityAttemptMixin,
-    MysqlExceptionMixin
+    # MysqlPriorityAttemptMixin,
+    # MysqlExceptionMixin
 ):
     __tablename__ = 'info_page'
 
