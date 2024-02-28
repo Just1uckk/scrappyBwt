@@ -1,6 +1,7 @@
 import scrapy
 from scrapy import Selector
 from scrapy.core.downloader.handlers.http11 import TunnelError
+from scrapy.utils.project import get_project_settings
 
 from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
@@ -18,14 +19,15 @@ def decode_util(response):
     return decoded_body
 
 
-class SitemapspiderSpider(HttpbinSpider):
-    name = "SitemapSpider"
+class SitemapSpider(HttpbinSpider):
+    name = "sitemap_spider"
 
     custom_settings = {"ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, }}
 
     def __init__(self, *args, **kwargs):
-        super(SitemapspiderSpider, self).__init__(*args, **kwargs)
-        self.result_queue_name = f"{self.name}_result_queue"
+        super(SitemapSpider, self).__init__(*args, **kwargs)
+        self.project_settings = get_project_settings()
+        self.result_queue_name = self.project_settings.get("RABBITMQ_SITEMAP_RESULTS")
 
     def start_requests(self):
         yield scrapy.Request("https://www.bbb.org/sitemap-business-profiles-index.xml", callback=self.parse_sitemap)
