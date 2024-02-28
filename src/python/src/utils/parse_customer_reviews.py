@@ -12,7 +12,7 @@ def regular_pattern(text):
 class ParseCustomerReviews:
     @staticmethod
     def parse_customer_reviews(response):
-        start_class = response.css('.dtm-stars')
+        start_class = response.xpath('//*[contains(@class, "dtm-stars")]')
         if len(start_class) > 0:
             parent_class = start_class.xpath('..')
             next_class = parent_class.xpath('following-sibling::p[1]/text()').get()
