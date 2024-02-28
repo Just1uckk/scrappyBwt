@@ -47,6 +47,7 @@ def upgrade():
                     sa.Column('parse_date', mysql.VARCHAR(255)),
                     sa.Column('business_contact_information', mysql.JSON()),
                     sa.Column('business_management', mysql.JSON()),
+                    sa.Column('sent_to_customer', mysql.VARCHAR(255), ),
                     )
     # ### end Alembic commands ###
 

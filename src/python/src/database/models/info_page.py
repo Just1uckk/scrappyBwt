@@ -43,4 +43,5 @@ class InfoPage(
     parse_date = Column(VARCHAR)
     business_contact_information = Column(JSON)
     business_management = Column(JSON)
+    sent_to_customer = Column(VARCHAR)
 

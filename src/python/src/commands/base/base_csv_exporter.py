@@ -19,12 +19,12 @@ from database.models.info_page import InfoPage
 
 
 class BaseCSVExporter(BaseCommand):
-    table: Table(InfoPage, InfoPage.__name__, InfoPage.metadata)
+    table: Table
     file_timestamp_format: str = '%Y%b%d%H%M%S'
     export_date_column: str = 'sent_to_customer'
     file_extension: str = 'csv'
     chunk_size: int = 1000
-    excluded_columns: List[str] = []
+    excluded_columns: List[str] = ['sent_to_customer']
     specific_columns: List[str] = []
     headers: List[str] = []
     new_mapping: Dict[str, str] = {}
@@ -159,7 +159,7 @@ class BaseCSVExporter(BaseCommand):
             postfix = self.filename_postfix
         if extension is None:
             extension = self.file_extension
-        export_path = path.join(path.abspath('..'), 'storage')
+        export_path = path.join(path.abspath('..'), 'src\storage')
         file_name = f'{prefix}{datetime.datetime.now().strftime(timestamp_format)}{postfix}.{extension}'
         return path.join(export_path, file_name)
 
