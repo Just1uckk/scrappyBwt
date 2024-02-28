@@ -61,16 +61,17 @@ class InfoSpider(TaskToMultipleResultsSpider):
         business_id = ParseID().parse_id(response.url)
         business_detailed_url = response.url
         # business_detailed_url = response.xpath("//a[@class='dtm-read-more']/@href").extract_first()
-        business_name = response.css('span.bds-h2::text').get()
+        business_name = response.xpath('//span[contains(@class,"bds-h2")]/text()').get()
         business_category = response.xpath('//h1[@class="stack"]/following-sibling::div[1]/text()').get()
-        business_address = ParseAddress().parse_address(response.css('address p.bds-body::text').getall())
+        business_address = ParseAddress().parse_address(
+            response.xpath('//address//p[contains(@class, "bds-body")]/text()').getall())
         business_web_url = response.xpath('//a[@class="dtm-url"]/@href').extract_first()
-        business_img_url = response.css('div.dtm-logo img::attr(src)').extract_first()
+        business_img_url = response.xpath('//div[contains(@class, "dtm-logo")]//img/@src').extract_first()
         business_phone = ParsePhoneNumber().clean_phone_number(response.xpath('//a[@class="dtm-phone"]/text()').get())
         business_hours = ParseWorkHours().parse_work_hours(response)
-        business_stars = response.css('div.dtm-stars + *::text').get()
+        business_stars = response.xpath('//div[contains(@class, "dtm-stars")]/following-sibling::*[1]/text()').get()
         business_customer_reviews = ParseCustomerReviews().parse_customer_reviews(response)
-        business_bbb_rating = response.css('span.dtm-rating span span::text').get()
+        business_bbb_rating = response.xpath('//span[contains(@class, "dtm-rating")]//span//span/text()').get()
         more_details_url = response.xpath('//a[@class="dtm-read-more"]/@href').extract_first()
         meta_info = {
             'business_id': business_id,
