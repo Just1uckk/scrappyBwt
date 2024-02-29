@@ -1,21 +1,21 @@
-from geopy import Nominatim
-from geopy.exc import GeocoderUnavailable
+import csv
+import os
+
+import pycountry
 
 
-def get_country(city):
-    try:
-        geolocator = Nominatim(user_agent="geoapiExercises")
-        location = geolocator.geocode(city)
-        if location:
-            return location.address.split(",")[-1].strip()
-        else:
-            return None
-    except GeocoderUnavailable as e:
-        print("GEOPY. Geocoding service is unavailable:", e)
-        return None
-    except Exception as e:
-        print("GEOPY. An error occurred:", e)
-        return None
+def find_country_by_city(city_name):
+    current_dir = os.path.dirname(__file__)
+    file_path = os.path.join(current_dir, 'cities15000.txt')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        reader = csv.reader(file, delimiter='\t')
+        for row in reader:
+            if row[1] == city_name:
+                country_code = row[8]
+                country = pycountry.countries.get(alpha_2=country_code)
+                if country:
+                    return country.name
+    return None
 
 
 class ParseAddress:
@@ -32,8 +32,7 @@ class ParseAddress:
                 street = revert_address_arr[3]
             return {
                 "full_address": ', '.join(refactor_address),
-                # "country": get_country(city),
-                "country": "Canada",
+                "country": find_country_by_city(city),
                 "region": region,
                 "city": city,
                 "street": street,
