@@ -102,7 +102,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
             '//div[contains(text(),"Primary Fax")]/preceding-sibling::span[1]/text()').get())
         business_management = ParseManagement().parse_management(response)
         business_contact_information = ParseContactInformation().parse_contact_information(response)
-        parse_date = datetime.strftime(datetime.now(), '%d/%m/%Y')
+        parse_date = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
         yield MetaInfoItem({
             'business_id': response.meta['business_id'],
             'business_name': response.meta['business_name'],
