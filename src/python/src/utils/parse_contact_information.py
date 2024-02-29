@@ -17,8 +17,6 @@ class ParseContactInformation:
                     result.append({"name": name, "position": position})
                 elif len(parts) == 1:
                     result.append({"name": parts[0]})
-                else:
-                    print("Invalid contact information")
             business_contact_information = json.dumps(result)
             return business_contact_information
         else:

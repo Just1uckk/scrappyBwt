@@ -6,11 +6,11 @@ from datetime import datetime
 
 from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
-from rmq.spiders import TaskToSingleResultSpider, TaskToMultipleResultsSpider
+from rmq.spiders import TaskToMultipleResultsSpider
 from rmq.utils import get_import_full_name, TaskStatusCodes
 from rmq.utils.decorators import rmq_callback, rmq_errback
-from utils import GeneratorUniqueId, ParseAddress, ParsePhoneNumber, ParseWorkHours, ParseCustomerReviews, \
-    ParseManagement, ParseContactInformation, ParseSocialMedia, ParseID
+from utils import ParseAddress, ParsePhoneNumber, ParseWorkHours, ParseCustomerReviews, \
+    ParseManagement, ParseContactInformation, ParseSocialMedia, ParseID, ParseCategories
 
 
 class MetaInfoItem(RMQItem):
@@ -45,9 +45,6 @@ class InfoSpider(TaskToMultipleResultsSpider):
         self.project_settings = get_project_settings()
         self.task_queue_name = self.project_settings.get("RABBITMQ_INFO_TASKS")
         self.result_queue_name = self.project_settings.get("RABBITMQ_INFO_RESULTS")
-        # Пример как подключится к таске
-        # first_task = self.processing_tasks.get_task(delivery_tag=1)
-        # first_task.exception = 'Something'
 
     def next_request(self, _delivery_tag, msg_body):
         data = json.loads(msg_body)
@@ -59,10 +56,9 @@ class InfoSpider(TaskToMultipleResultsSpider):
     @rmq_callback
     def parse(self, response):
         business_id = ParseID().parse_id(response.url)
-        business_detailed_url = response.url
-        # business_detailed_url = response.xpath("//a[@class='dtm-read-more']/@href").extract_first()
+        business_detailed_url = response.xpath("//a[@class='dtm-read-more']/@href").extract_first()
         business_name = response.xpath('//span[contains(@class,"bds-h2")]/text()').get()
-        business_category = response.xpath('//h1[@class="stack"]/following-sibling::div[1]/text()').get()
+        business_category = ParseCategories().parse_categories(response)
         business_address = ParseAddress().parse_address(
             response.xpath('//address//p[contains(@class, "bds-body")]/text()').getall())
         business_web_url = response.xpath('//a[@class="dtm-url"]/@href').extract_first()
@@ -103,7 +99,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
             '//div[contains(text(),"Primary Fax")]/preceding-sibling::span[1]/text()').get())
         business_management = ParseManagement().parse_management(response)
         business_contact_information = ParseContactInformation().parse_contact_information(response)
-        parse_date = datetime.strftime(datetime.now(), '%d/%m/%Y')
+        parse_date = datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S.%fZ')
         yield MetaInfoItem({
             'business_id': response.meta['business_id'],
             'business_name': response.meta['business_name'],
