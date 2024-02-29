@@ -17,8 +17,6 @@ class ParseManagement:
                     result.append({"name": name, "position": position})
                 elif len(parts) == 1:
                     result.append({"name": parts[0]})
-                else:
-                    print("Invalid contact information")
             business_management = json.dumps(result)
             return business_management
         else:
