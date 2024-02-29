@@ -10,7 +10,7 @@ from rmq.spiders import TaskToMultipleResultsSpider
 from rmq.utils import get_import_full_name, TaskStatusCodes
 from rmq.utils.decorators import rmq_callback, rmq_errback
 from utils import ParseAddress, ParsePhoneNumber, ParseWorkHours, ParseCustomerReviews, \
-    ParseManagement, ParseContactInformation, ParseSocialMedia, ParseID
+    ParseManagement, ParseContactInformation, ParseSocialMedia, ParseID, ParseCategories
 
 
 class MetaInfoItem(RMQItem):
@@ -58,7 +58,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
         business_id = ParseID().parse_id(response.url)
         business_detailed_url = response.xpath("//a[@class='dtm-read-more']/@href").extract_first()
         business_name = response.css('span.bds-h2::text').get()
-        business_category = response.xpath('//h1[@class="stack"]/following-sibling::div[1]/text()').get()
+        business_category = ParseCategories().parse_categories(response)
         business_address = ParseAddress().parse_address(response.css('address p.bds-body::text').getall())
         business_web_url = response.xpath('//a[@class="dtm-url"]/@href').extract_first()
         business_img_url = response.css('div.dtm-logo img::attr(src)').extract_first()
@@ -98,7 +98,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
             '//div[contains(text(),"Primary Fax")]/preceding-sibling::span[1]/text()').get())
         business_management = ParseManagement().parse_management(response)
         business_contact_information = ParseContactInformation().parse_contact_information(response)
-        parse_date = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        parse_date = datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S.%fZ')
         yield MetaInfoItem({
             'business_id': response.meta['business_id'],
             'business_name': response.meta['business_name'],
