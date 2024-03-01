@@ -56,6 +56,7 @@ class Producer(ScrapyCommand):
         self.check_interact_ready_delay = Producer._DEFAULT_CHECK_INTERACT_READY_DELAY
 
     def set_logger(self, name: str = "COMMAND", level: str = "DEBUG"):
+        level = self.project_settings.get("LOG_LEVEL_PRODUCER", "WARNING")
         self.logger = logging.getLogger(name=name)
         self.logger.setLevel(level)
         configure_logging()
