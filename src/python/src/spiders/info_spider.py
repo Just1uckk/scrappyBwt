@@ -4,6 +4,7 @@ import scrapy
 from scrapy.utils.project import get_project_settings
 from datetime import datetime
 
+from middlewares import BlockedRetryMiddleware
 from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
 from rmq.spiders import TaskToMultipleResultsSpider
@@ -38,7 +39,10 @@ class MetaInfoItem(RMQItem):
 class InfoSpider(TaskToMultipleResultsSpider):
     name = "info_spider"
 
-    custom_settings = {"ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, }}
+    custom_settings = {
+        "ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, },
+        'DOWNLOADER_MIDDLEWARES': {get_import_full_name(BlockedRetryMiddleware): 543, }
+    }
 
     def __init__(self, *args, **kwargs):
         super(InfoSpider, self).__init__(*args, **kwargs)
