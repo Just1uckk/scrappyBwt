@@ -41,7 +41,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
 
     custom_settings = {
         "ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, },
-        'DOWNLOADER_MIDDLEWARES': {get_import_full_name(BlockedRetryMiddleware): 543, }
+        # 'DOWNLOADER_MIDDLEWARES': {get_import_full_name(BlockedRetryMiddleware): 600, }
     }
 
     def __init__(self, *args, **kwargs):
