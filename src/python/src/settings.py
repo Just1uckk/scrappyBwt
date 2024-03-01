@@ -44,6 +44,8 @@ DOWNLOADER_MIDDLEWARES = {
     "middlewares.HttpProxyMiddleware": 543,
 }
 
+LOG_LEVEL_PRODUCER = os.getenv("LOG_LEVEL_PRODUCER", "INFO")
+LOG_LEVEL_CONSUMER = os.getenv("LOG_LEVEL_CONSUMER", "INFO")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_FILE = os.getenv("LOG_FILE") if os.getenv("LOG_FILE", "") else None
 
