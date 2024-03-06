@@ -29,7 +29,8 @@ To install this project, you need to:
 3. Use "poetry install"
 4. Then use "poetry shell" to enable virtual environment
 5. Create and populate a file .env in the project root
-6. Perfect. Project installed.
+6. For example, you can use "cp .env.example .env"
+7. Perfect. Project installed.
 
 ## Usage
 
