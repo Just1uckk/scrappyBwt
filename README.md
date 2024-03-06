@@ -36,9 +36,10 @@ To install this project, you need to:
 To use the project, we recommend:
 1. Go to the project root.
 2. Go to the PM2 folder "cd pm2"
-3. "pm2 start pm2.config.js"
-4. To stop all process - use "pm2 stop all"
-5. To export all results - use "scrapy business_exporter_command" from poetry shell.
+3. Create a new "pm2.config.js" file with command "cp pm2.config.example.js pm2.config.js"
+4. "pm2 start pm2.config.js"
+5. To stop all process - use "pm2 stop all"
+6. To export all results - use "scrapy business_exporter_command" from poetry shell.
 
 ## Configuration
 
