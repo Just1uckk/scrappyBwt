@@ -110,6 +110,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
         business_management = ParseManagement().parse_management(response)
         business_contact_information = ParseContactInformation().parse_contact_information(response)
         parse_date = datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.logger.info(f"Business: {response.meta['business_name']}. Parsed successfully: {parse_date}.")
         yield MetaInfoItem({
             'business_id': response.meta['business_id'],
             'business_name': response.meta['business_name'],

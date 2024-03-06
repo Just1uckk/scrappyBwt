@@ -22,7 +22,7 @@ def upgrade():
                     sa.Column('id', mysql.BIGINT(unsigned=True), autoincrement=True, primary_key=True, nullable=False),
                     sa.Column('status', mysql.MEDIUMINT(unsigned=True), server_default=sa.text('0'), nullable=False,
                               unique=False, index=True),
-                    sa.Column('sitemap_url', sa.String(255), nullable=False, primary_key=True),
+                    sa.Column('sitemap_url', sa.String(255), nullable=False),
                     sa.Column('created_at', sa.TIMESTAMP, nullable=False,
                               server_default=sa.text("CURRENT_TIMESTAMP")),
                     sa.Column('updated_at', sa.TIMESTAMP, nullable=False, index=False, unique=False,

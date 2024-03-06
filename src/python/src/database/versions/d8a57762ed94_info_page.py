@@ -26,8 +26,7 @@ def upgrade():
                     sa.Column('updated_at', sa.TIMESTAMP, nullable=False, index=False, unique=False,
                               server_onupdate=sa.text("CURRENT_TIMESTAMP"),
                               server_default=sa.text("CURRENT_TIMESTAMP")),
-
-                    sa.Column('business_id', mysql.BIGINT(), index=True, nullable=False, primary_key=True),
+                    sa.Column('business_id', mysql.VARCHAR(255), index=True, nullable=False),
                     sa.Column('business_name', mysql.TEXT()),
                     sa.Column('business_address', mysql.VARCHAR(768)),
                     sa.Column('business_category', mysql.TEXT()),

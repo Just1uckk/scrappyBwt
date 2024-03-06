@@ -23,7 +23,7 @@ class InfoPage(
 ):
     __tablename__ = 'info_page'
 
-    business_id = Column(BIGINT, primary_key=True, index=True, unique=True, nullable=False)
+    business_id = Column(VARCHAR(255), index=True, unique=True, nullable=False)
     business_name = Column(TEXT)
     business_address = Column(VARCHAR(768))
     business_category = Column(TEXT)

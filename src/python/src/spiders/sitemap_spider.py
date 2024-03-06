@@ -43,6 +43,7 @@ class SitemapSpider(HttpbinSpider):
         selector = decode_util(response)
         urls = selector.xpath('//loc/text()').extract()
         for loc in urls:
+            self.logger.info(f'Sitemap url: {loc} parsed successfully.')
             yield MetaUrlItem({'url': loc})
 
     @rmq_errback
