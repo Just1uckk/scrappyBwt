@@ -41,8 +41,14 @@ class InfoSpider(TaskToMultipleResultsSpider):
 
     custom_settings = {
         "ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, },
-        # 'DOWNLOADER_MIDDLEWARES': {get_import_full_name(BlockedRetryMiddleware): 600, }
     }
+
+    @classmethod
+    def update_settings(cls, settings):
+        super().update_settings(settings)
+        downloader_middlewares = settings.get("DOWNLOADER_MIDDLEWARES")
+        downloader_middlewares[get_import_full_name(BlockedRetryMiddleware)] = 500
+        settings.set("DOWNLOADER_MIDDLEWARES", downloader_middlewares)
 
     def __init__(self, *args, **kwargs):
         super(InfoSpider, self).__init__(*args, **kwargs)
