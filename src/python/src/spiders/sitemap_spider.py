@@ -1,19 +1,12 @@
 import scrapy
-from scrapy import Selector
 from scrapy.core.downloader.handlers.http11 import TunnelError
 from scrapy.utils.project import get_project_settings
 
 from items.sitemap_item import SitemapItem
-from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
 from rmq.spiders import HttpbinSpider
 from rmq.utils import get_import_full_name
 from rmq.utils.decorators import rmq_callback, rmq_errback
-
-
-def decode_util(response):
-    decoded_body = Selector(text=response.body.decode('utf-8'))
-    return decoded_body
 
 
 class SitemapSpider(HttpbinSpider):
@@ -31,18 +24,14 @@ class SitemapSpider(HttpbinSpider):
                              callback=self.parse_sitemap)
 
     def parse_sitemap(self, response):
-        selector = decode_util(response)
-        urls = selector.xpath('//loc/text()').extract()
-        for loc in urls:
-            yield scrapy.Request(loc, callback=self.parse)
+        for url in response.xpath('//*[local-name()="loc"]/text()').getall():
+            yield scrapy.Request(url, callback=self.parse)
 
     @rmq_callback
     def parse(self, response):
-        selector = decode_util(response)
-        urls = selector.xpath('//loc/text()').extract()
-        for loc in urls:
-            self.logger.info(f'Sitemap url: {loc} parsed successfully.')
-            yield SitemapItem({'url': loc})
+        for url in response.xpath('//*[local-name()="loc"]/text()').getall():
+            self.logger.info(f'Sitemap url: {url} parsed successfully.')
+            yield SitemapItem({'url': url})
 
     @rmq_errback
     def _errback(self, failure):
