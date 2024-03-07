@@ -13,6 +13,7 @@ class InfoPagesResultConsumer(Consumer):
 
     def build_message_store_stmt(self, message_body):
         stmt = insert(InfoPage)
+        stmt = stmt.prefix_with('IGNORE')
         stmt = stmt.values({
             "business_id": message_body['business_id'],
             "business_name": message_body['business_name'],
