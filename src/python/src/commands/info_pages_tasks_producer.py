@@ -15,8 +15,7 @@ class InfoPagesTasksProducer(Producer):
         self.max_attempts = 3
 
     def build_task_query_stmt(self, chunk_size):
-        stmt = select([SitemapPages]).where(
-            # SitemapPages.status == TaskStatusCodes.NOT_PROCESSED.value
+        stmt = select([SitemapPages.id, SitemapPages.status, SitemapPages.attempt, SitemapPages.sitemap_url]).where(
             and_(
                 or_(SitemapPages.status == TaskStatusCodes.NOT_PROCESSED.value,
                     SitemapPages.status == TaskStatusCodes.ERROR.value),
