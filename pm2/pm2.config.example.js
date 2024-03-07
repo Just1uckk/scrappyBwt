@@ -10,18 +10,18 @@ const {
 
 const spiders = [
   {
-    name: `${PROJECT_PREFIX}_sitemap_spider`,
+    name: `${PROJECT_PREFIX}_bbb_sitemap_spider`,
     script: SCRAPY_SCRIPT,
-    args: `crawl sitemap_spider`,
+    args: `crawl bbb_sitemap_spider`,
     interpreter: PYTHON_INTERPRETER,
     instances: 1,
     autorestart: true,
     cron_restart: "0 0 * * *",
   },
   {
-    name: `${PROJECT_PREFIX}_info_spider`,
+    name: `${PROJECT_PREFIX}_bbb_business_spider`,
     script: SCRAPY_SCRIPT,
-    args: `crawl info_spider`,
+    args: `crawl bbb_business_spider`,
     interpreter: PYTHON_INTERPRETER,
     instances: 4,
     autorestart: true,
@@ -72,6 +72,7 @@ const consumers = [
 ];
 
 const commands = [];
+
 const processNames = [];
 const apps = [];
 

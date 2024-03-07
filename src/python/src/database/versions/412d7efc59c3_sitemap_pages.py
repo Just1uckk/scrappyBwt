@@ -34,8 +34,6 @@ def upgrade():
                     sa.Column('exception', mysql.TEXT(), nullable=True, unique=False),
                     )
     op.create_index(op.f('ix_sitemap_pages_sitemap_url'), 'sitemap_pages', ['sitemap_url'], unique=False)
-    # op.create_index(op.f('ix_sitemap_updated_at'), 'sitemap_pages', ['updated_at'], unique=False)
-    # op.create_index(op.f('ix_sitemap_priority'), 'sitemap_pages', ['priority'], unique=False)
     op.create_index(op.f('ix_sitemap_attempt'), 'sitemap_pages', ['attempt'], unique=False)
     # ### end Alembic commands ###
 

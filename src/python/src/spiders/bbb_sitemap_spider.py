@@ -9,13 +9,13 @@ from rmq.utils import get_import_full_name
 from rmq.utils.decorators import rmq_callback, rmq_errback
 
 
-class SitemapSpider(HttpbinSpider):
-    name = "sitemap_spider"
+class BBBSitemapSpider(HttpbinSpider):
+    name = "bbb_sitemap_spider"
 
     custom_settings = {"ITEM_PIPELINES": {get_import_full_name(ItemProducerPipeline): 310, }}
 
     def __init__(self, *args, **kwargs):
-        super(SitemapSpider, self).__init__(*args, **kwargs)
+        super(BBBSitemapSpider, self).__init__(*args, **kwargs)
         self.project_settings = get_project_settings()
         self.result_queue_name = self.project_settings.get("RABBITMQ_SITEMAP_RESULTS")
 
