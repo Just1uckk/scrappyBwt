@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.mysql import insert
 
-from database.models.sitemap_pages import SitemapPages
+from database.models.sitemap_model import SitemapModel
 from rmq.commands import Consumer
 from rmq.utils import TaskStatusCodes
 
@@ -13,7 +13,7 @@ class SitemapPagesResultConsumer(Consumer):
 
     def build_message_store_stmt(self, message_body):
         message_body['status'] = TaskStatusCodes.SUCCESS.value
-        stmt = insert(SitemapPages)
+        stmt = insert(SitemapModel)
         stmt = stmt.on_duplicate_key_update({
             'status': stmt.inserted.status
         }).values({

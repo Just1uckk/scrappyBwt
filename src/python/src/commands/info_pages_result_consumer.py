@@ -1,7 +1,7 @@
 from sqlalchemy.dialects.mysql import insert
 from scrapy.utils.project import get_project_settings
 
-from database.models.info_page import InfoPage
+from database.models.business_model import BusinessModel
 from rmq.commands import Consumer
 
 
@@ -12,7 +12,7 @@ class InfoPagesResultConsumer(Consumer):
         return queue_name
 
     def build_message_store_stmt(self, message_body):
-        stmt = insert(InfoPage)
+        stmt = insert(BusinessModel)
         stmt = stmt.prefix_with('IGNORE')
         stmt = stmt.values({
             "bbb_id": message_body['bbb_id'],

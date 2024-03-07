@@ -11,7 +11,7 @@ from .mixins import (
 from sqlalchemy.dialects.mysql import TEXT
 
 
-class SitemapPages(
+class SitemapModel(
     Base,
     MysqlPrimaryKeyMixin,
     MysqlStatusMixin,
@@ -19,6 +19,6 @@ class SitemapPages(
     MysqlPriorityAttemptMixin,
     MysqlExceptionMixin
 ):
-    __tablename__ = 'sitemap_pages'
+    __tablename__ = 'sitemap_model'
 
     sitemap_url = Column(TEXT, nullable=False, index=True)

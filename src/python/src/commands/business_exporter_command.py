@@ -4,12 +4,12 @@ from typing import Dict
 from sqlalchemy import update
 
 from commands.base import BaseCSVExporter
-from database.models.info_page import InfoPage
+from database.models.business_model import BusinessModel
 from sqlalchemy.sql.base import Executable as SQLAlchemyExecutable
 
 
 class BusinessExporterCommand(BaseCSVExporter):
-    table = InfoPage
+    table = BusinessModel
 
     def build_update_query_stmt(self, row: Dict) -> SQLAlchemyExecutable:
         export_date = {self.export_date_column: datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S.%fZ')}

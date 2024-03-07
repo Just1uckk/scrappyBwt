@@ -1,7 +1,7 @@
 from sqlalchemy import select, update, text, and_, or_
 from scrapy.utils.project import get_project_settings
 
-from database.models.sitemap_pages import SitemapPages
+from database.models.sitemap_model import SitemapModel
 from rmq.commands import Producer
 from rmq.utils import TaskStatusCodes
 
@@ -15,18 +15,18 @@ class InfoPagesTasksProducer(Producer):
         self.max_attempts = 3
 
     def build_task_query_stmt(self, chunk_size):
-        stmt = select([SitemapPages.id, SitemapPages.status, SitemapPages.attempt, SitemapPages.sitemap_url]).where(
+        stmt = select([SitemapModel.id, SitemapModel.status, SitemapModel.attempt, SitemapModel.sitemap_url]).where(
             and_(
-                or_(SitemapPages.status == TaskStatusCodes.NOT_PROCESSED.value,
-                    SitemapPages.status == TaskStatusCodes.ERROR.value),
-                SitemapPages.attempt < self.max_attempts,
+                or_(SitemapModel.status == TaskStatusCodes.NOT_PROCESSED.value,
+                    SitemapModel.status == TaskStatusCodes.ERROR.value),
+                SitemapModel.attempt < self.max_attempts,
                 ),
-            ).order_by(SitemapPages.id.asc()).limit(chunk_size)
+            ).order_by(SitemapModel.id.asc()).limit(chunk_size)
         return stmt
 
     def build_task_update_stmt(self, db_task, status):
-        return update(SitemapPages).where(
-            SitemapPages.id == db_task["id"]
+        return update(SitemapModel).where(
+            SitemapModel.id == db_task["id"]
         ).values({
             "status": TaskStatusCodes.IN_QUEUE.value,
             "attempt": text("attempt + 1")

@@ -13,15 +13,12 @@ from .mixins import (
 from sqlalchemy.dialects.mysql import TEXT, INTEGER, BIGINT, MEDIUMINT
 
 
-class InfoPage(
+class BusinessModel(
     Base,
     MysqlPrimaryKeyMixin,
-    # MysqlStatusMixin,
     MysqlTimestampsMixin,
-    # MysqlPriorityAttemptMixin,
-    # MysqlExceptionMixin
 ):
-    __tablename__ = 'info_page'
+    __tablename__ = 'business_model'
 
     bbb_id = Column(VARCHAR(255), index=True, unique=True, nullable=False)
     name = Column(TEXT)
