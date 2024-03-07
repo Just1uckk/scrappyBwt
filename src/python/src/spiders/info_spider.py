@@ -4,8 +4,8 @@ import scrapy
 from scrapy.utils.project import get_project_settings
 from datetime import datetime
 
+from items.info_business_item import InfoBusinessItem
 from middlewares import BlockedRetryMiddleware
-from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
 from rmq.spiders import TaskToMultipleResultsSpider
 from rmq.utils import get_import_full_name, TaskStatusCodes
@@ -13,28 +13,6 @@ from rmq.utils.decorators import rmq_callback, rmq_errback
 from utils import ParseAddress, ParsePhoneNumber, ParseWorkHours, ParseCustomerReviews, \
     ParseManagement, ParseContactInformation, ParseSocialMedia, ParseID, ParseCategories
 
-
-class MetaInfoItem(RMQItem):
-    business_id = scrapy.Field()
-    business_name = scrapy.Field()
-    business_address = scrapy.Field()
-    business_category = scrapy.Field()
-    business_web_url = scrapy.Field()
-    business_img_url = scrapy.Field()
-    business_detailed_url = scrapy.Field()
-    business_phone = scrapy.Field()
-    business_fax = scrapy.Field()
-    business_hours = scrapy.Field()
-    business_stars = scrapy.Field()
-    business_customer_reviews = scrapy.Field()
-    business_bbb_rating = scrapy.Field()
-    business_accredited_date = scrapy.Field()
-    business_social_media = scrapy.Field()
-    business_years = scrapy.Field()
-    business_started_date = scrapy.Field()
-    parse_date = scrapy.Field()
-    business_contact_information = scrapy.Field()
-    business_management = scrapy.Field()
 
 class InfoSpider(TaskToMultipleResultsSpider):
     name = "info_spider"
@@ -117,7 +95,7 @@ class InfoSpider(TaskToMultipleResultsSpider):
         business_contact_information = ParseContactInformation().parse_contact_information(response)
         parse_date = datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S.%fZ')
         self.logger.info(f"Business: {response.meta['business_name']}. Parsed successfully: {parse_date}.")
-        yield MetaInfoItem({
+        yield InfoBusinessItem({
             'business_id': response.meta['business_id'],
             'business_name': response.meta['business_name'],
             'business_category': response.meta['business_category'],
@@ -149,7 +127,6 @@ class InfoSpider(TaskToMultipleResultsSpider):
         self.processing_tasks.set_status(delivery_tag, TaskStatusCodes.ERROR.value)
         self.processing_tasks.set_exception(delivery_tag, f'Code: {status_code}. Description: {description}')
 
-
     @rmq_errback
     def _errback_second(self, failure):
         delivery_tag = failure.request.meta["delivery_tag"]
@@ -158,4 +135,3 @@ class InfoSpider(TaskToMultipleResultsSpider):
         self.logger.error(f'Code: {status_code}. Description: {description}')
         self.processing_tasks.set_status(delivery_tag, TaskStatusCodes.ERROR.value)
         self.processing_tasks.set_exception(delivery_tag, f'Code: {status_code}. Description: {description}')
-

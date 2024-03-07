@@ -3,15 +3,12 @@ from scrapy import Selector
 from scrapy.core.downloader.handlers.http11 import TunnelError
 from scrapy.utils.project import get_project_settings
 
+from items.sitemap_item import SitemapItem
 from rmq.items import RMQItem
 from rmq.pipelines import ItemProducerPipeline
 from rmq.spiders import HttpbinSpider
 from rmq.utils import get_import_full_name
 from rmq.utils.decorators import rmq_callback, rmq_errback
-
-
-class MetaUrlItem(RMQItem):
-    url = scrapy.Field()
 
 
 def decode_util(response):
@@ -30,7 +27,8 @@ class SitemapSpider(HttpbinSpider):
         self.result_queue_name = self.project_settings.get("RABBITMQ_SITEMAP_RESULTS")
 
     def start_requests(self):
-        yield scrapy.Request("https://www.bbb.org/sitemap-accredited-business-profiles-index.xml", callback=self.parse_sitemap)
+        yield scrapy.Request("https://www.bbb.org/sitemap-accredited-business-profiles-index.xml",
+                             callback=self.parse_sitemap)
 
     def parse_sitemap(self, response):
         selector = decode_util(response)
@@ -44,7 +42,7 @@ class SitemapSpider(HttpbinSpider):
         urls = selector.xpath('//loc/text()').extract()
         for loc in urls:
             self.logger.info(f'Sitemap url: {loc} parsed successfully.')
-            yield MetaUrlItem({'url': loc})
+            yield SitemapItem({'url': loc})
 
     @rmq_errback
     def _errback(self, failure):
