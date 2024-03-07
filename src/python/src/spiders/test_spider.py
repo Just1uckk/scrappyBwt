@@ -7,9 +7,11 @@ from utils import ParseWorkHours, ParseCustomerReviews, ParseManagement, ParseSo
 class TestSpider(scrapy.Spider):
     name = "test_spider"
     allowed_domains = ["bbb.org"]
-    start_urls = ["https://www.bbb.org/us/tx/san-antonio/profile/auto-repair/dynamic-car-service-0825-90105933"]
+    start_urls = ["https://www.bbb.org/us/ca/san-francisco/profile/auto-body-repair-and-painting/lombard-auto-body-llc-1116-458274"]
 
     def parse(self, response):
-        test = ParseID.parse_id(response.url)
+        test = response.xpath(
+            '//dt[contains(text(),"Accredited Since")]/following-sibling::dd[1]/text()').get()
+        print('BUSINESS ACCREDITED DATE')
         print(test)
         pass

@@ -30,7 +30,7 @@ class SitemapSpider(HttpbinSpider):
         self.result_queue_name = self.project_settings.get("RABBITMQ_SITEMAP_RESULTS")
 
     def start_requests(self):
-        yield scrapy.Request("https://www.bbb.org/sitemap-business-profiles-index.xml", callback=self.parse_sitemap)
+        yield scrapy.Request("https://www.bbb.org/sitemap-accredited-business-profiles-index.xml", callback=self.parse_sitemap)
 
     def parse_sitemap(self, response):
         selector = decode_util(response)
