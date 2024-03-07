@@ -27,7 +27,6 @@ class SitemapSpider(HttpbinSpider):
         for url in response.xpath('//*[local-name()="loc"]/text()').getall():
             yield scrapy.Request(url, callback=self.parse)
 
-    @rmq_callback
     def parse(self, response):
         for url in response.xpath('//*[local-name()="loc"]/text()').getall():
             self.logger.info(f'Sitemap url: {url} parsed successfully.')

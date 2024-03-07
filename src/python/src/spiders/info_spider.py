@@ -79,13 +79,21 @@ class InfoSpider(TaskToMultipleResultsSpider):
         business_accredited_date = response.xpath(
             '//dt[contains(text(),"Accredited Since")]/following-sibling::dd[1]/text()').get()
         if business_accredited_date is not None:
-            business_accredited_date = datetime.strptime(business_accredited_date, "%m/%d/%Y")
-            business_accredited_date = business_accredited_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            try:
+                business_accredited_date = datetime.strptime(business_accredited_date, "%m/%d/%Y")
+                business_accredited_date = business_accredited_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            except ValueError:
+                business_accredited_date = datetime.strptime(business_accredited_date, "%d/%m/%Y")
+                business_accredited_date = business_accredited_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         business_started_date = response.xpath(
             '//dt[contains(text(),"Business Started")]/following-sibling::dd[1]/text()').get()
         if business_started_date is not None:
-            business_started_date = datetime.strptime(business_started_date, "%m/%d/%Y")
-            business_started_date = business_started_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            try:
+                business_started_date = datetime.strptime(business_started_date, "%m/%d/%Y")
+                business_started_date = business_started_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            except ValueError:
+                business_started_date = datetime.strptime(business_started_date, "%d/%m/%Y")
+                business_started_date = business_started_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         business_years = response.xpath(
             '//dt[contains(text(),"Years in Business")]/following-sibling::dd[1]/text()').get()
         business_social_media = ParseSocialMedia().parse_social_media(response)
