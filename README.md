@@ -29,16 +29,18 @@ To install this project, you need to:
 3. Use "poetry install"
 4. Then use "poetry shell" to enable virtual environment
 5. Create and populate a file .env in the project root
-6. Perfect. Project installed.
+6. For example, you can use "cp .env.example .env"
+7. Perfect. Project installed.
 
 ## Usage
 
 To use the project, we recommend:
 1. Go to the project root.
 2. Go to the PM2 folder "cd pm2"
-3. "pm2 start pm2.config.js"
-4. To stop all process - use "pm2 stop all"
-5. To export all results - use "scrapy business_exporter_command" from poetry shell.
+3. Create a new "pm2.config.js" file with command "cp pm2.config.example.js pm2.config.js"
+4. "pm2 start pm2.config.js"
+5. To stop all process - use "pm2 stop all"
+6. To export all results - use "scrapy business_exporter_command" from poetry shell.
 
 ## Configuration
 

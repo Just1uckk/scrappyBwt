@@ -5,47 +5,73 @@ const {
   PROJECT_PREFIX,
   MAX_MEMORY_RESTART,
   PYTHON_CWD,
-  TYPESCRIPT_CWD,
   PM2_LOG_DIRECTORY,
-  NODEJS_SCRIPT,
 } = require('./settings/settings');
 
 const spiders = [
   {
-    name: `${PROJECT_PREFIX}_spider`,
+    name: `${PROJECT_PREFIX}_bbb_sitemap_spider`,
     script: SCRAPY_SCRIPT,
-    args: "crawl spider_name",
+    args: `crawl bbb_sitemap_spider`,
     interpreter: PYTHON_INTERPRETER,
     instances: 1,
     autorestart: true,
-    cron_restart: "0 * * * *",
+    cron_restart: "0 0 * * *",
   },
   {
-    name: `${PROJECT_PREFIX}_puppeteer_spider`,
-    script: NODEJS_SCRIPT,
-    cwd: TYPESCRIPT_CWD,
-    args: `build/index.js crawl example --url="https://api.myip.com/"`,
-    instances: 1,
+    name: `${PROJECT_PREFIX}_bbb_business_spider`,
+    script: SCRAPY_SCRIPT,
+    args: `crawl bbb_business_spider`,
+    interpreter: PYTHON_INTERPRETER,
+    instances: 4,
     autorestart: true,
-    cron_restart: "0 * * * *",
+    cron_restart: "0 0 * * *",
   }
 ];
 
-const producers = [];
-
-const consumers = [];
-
-const commands = [
+const producers = [
   {
-    name: `${PROJECT_PREFIX}_command_name`,
+    name: `${PROJECT_PREFIX}_info_pages_tasks_producer`,
     script: SCRAPY_SCRIPT,
-    args: "scrapy_command_name --args1=123 --args2=text",
+    args: "info_pages_tasks_producer -m worker",
     interpreter: PYTHON_INTERPRETER,
     instances: 1,
     autorestart: true,
-    cron_restart: "0 * * * *",
-  },
+    cron_restart: "0 0 * * *",
+  }
 ];
+
+const consumers = [
+  {
+    name: `${PROJECT_PREFIX}_sitemap_pages_result_consumer`,
+    script: SCRAPY_SCRIPT,
+    args: "sitemap_pages_result_consumer -m worker",
+    interpreter: PYTHON_INTERPRETER,
+    instances: 1,
+    autorestart: true,
+    cron_restart: "0 0 * * *",
+  },
+  {
+    name: `${PROJECT_PREFIX}_info_pages_replies_consumer`,
+    script: SCRAPY_SCRIPT,
+    args: "info_pages_replies_consumer -m worker",
+    interpreter: PYTHON_INTERPRETER,
+    instances: 1,
+    autorestart: true,
+    cron_restart: "0 0 * * *",
+  },
+  {
+    name: `${PROJECT_PREFIX}_info_pages_result_consumer`,
+    script: SCRAPY_SCRIPT,
+    args: "info_pages_result_consumer -m worker",
+    interpreter: PYTHON_INTERPRETER,
+    instances: 1,
+    autorestart: true,
+    cron_restart: "0 0 * * *",
+  }
+];
+
+const commands = [];
 
 const processNames = [];
 const apps = [];

@@ -1,6 +1,6 @@
 from sqlalchemy import update
 
-from database.models.sitemap_pages import SitemapPages
+from database.models.sitemap_model import SitemapModel
 from rmq.commands import Consumer
 from scrapy.utils.project import get_project_settings
 
@@ -13,9 +13,9 @@ class InfoPagesRepliesConsumer(Consumer):
 
     def build_message_store_stmt(self, message_body):
         return update(
-            SitemapPages
+            SitemapModel
         ).where(
-            SitemapPages.id == message_body['id']
+            SitemapModel.id == message_body['id']
         ).values({
             'status': message_body['status'],
             "exception": message_body['exception']

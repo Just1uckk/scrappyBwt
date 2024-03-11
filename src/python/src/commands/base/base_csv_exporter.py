@@ -15,7 +15,6 @@ from twisted.enterprise.adbapi import Transaction
 from twisted.internet import reactor, defer
 
 from commands.base import BaseCommand
-from database.models.info_page import InfoPage
 
 
 class BaseCSVExporter(BaseCommand):
